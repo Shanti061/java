@@ -1,0 +1,365 @@
+//EMPLOYEE DATA SEARCH, ADD,REMOVE,LIST
+
+PROCESSOR/MAINPROGRAM
+
+package day2.processor;
+
+import day2.gui.CommandInterface;
+import day2.models.Employee;
+import day2.models.GeneratedEmployees;
+
+import static day2.models.GeneratedEmployees.employees;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class ProgramMain {
+
+    public static void main(String[] args)
+    {
+        //create temp employees collection
+        GeneratedEmployees.createEmployees();
+        CommandInterface.display();
+
+        //loop to display the values from the generatedemployees class
+
+    }
+}
+
+//PROCESSOR/TASKPROCESSING
+
+package day2.processor;
+
+import day2.models.Employee;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static day2.models.GeneratedEmployees.employees;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class TaskProcessing {
+
+    public static void listAllEmployees(){
+
+        for(Employee e : employees){
+            System.out.println(e);
+        }
+    }
+
+    public static String createNew(List<String> data) {
+        try {
+            String[] dob = data.get(3).split("/"); //splitting the dob value to string and assigning to a string.
+            String[] hd = data.get(4).split("/");
+            //first value of the list/ID
+            Employee temp = new Employee(Integer.parseInt(data.get(0)), data.get(1), data.get(2),
+                    LocalDate.of(Integer.parseInt(dob[0]), Integer.parseInt(dob[1]), Integer.parseInt(dob[2])),
+                    LocalDate.of(Integer.parseInt(hd[0]), Integer.parseInt(hd[1]), Integer.parseInt(hd[2])), data.get(5));
+
+            employees.add(temp);
+            return "Successfully created: " + temp.getFirstName();
+        } catch (Exception e){
+            return "Failure caused by: " + e ;
+        }
+    }
+
+
+    public static String searchByFirstName(String fn){
+        String result = "";
+
+        for(int i = 0; i < employees.size(); i++){
+            //comparing the name with every employee name for search
+            if(employees.get(i).getFirstName().equalsIgnoreCase(fn))  //get the record's firstname check with the user input
+            result += employees.get(i).toString() + "\n";
+
+
+        }
+        if(result != "")
+            return result;
+
+        return "NOT FOUND";
+
+    }
+
+}
+
+
+//GUI/COMMANDINTERFACE
+
+package day2.gui;
+
+import day2.models.Employee;
+import day2.processor.TaskProcessing;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class CommandInterface {
+
+    static Scanner input = new Scanner(System.in);
+    static boolean edit = false;
+
+
+    public static  void display(){
+        //temp int data to store user's choice
+        int choice;
+        boolean keeping_running = true;
+
+        //give 6 options
+        while(keeping_running){
+
+            do{
+                //choices
+                System.out.println("Welcome to Employee Awesome Program");
+                System.out.println("1. List all Employees");
+                System.out.println("2. Add new Employee");
+                System.out.println("3. Edit an Employee");
+                System.out.println("4. Remove an Employee");
+                System.out.println("5. Search");
+                System.out.println("6. Terminate");
+                System.out.print("Please input option between 1 -6 : ");
+
+                choice = input.nextInt();
+            }while(choice < 1 || choice > 6); //if the choice is less than 1 or greater than 6 the loop will continue looping
+
+            //after the user chooses an option it will enter the switch case
+            switch(choice){
+                case 1:
+                    TaskProcessing.listAllEmployees();
+                break;
+
+               case 2:
+                   //creating new employee, adding details, taskprocessing will display
+                    System.out.println(TaskProcessing.createNew(inputDetails(null)));
+                   break;
+
+                case 3:
+                    edit = true;
+                    break;
+
+                case 4:
+                    break;
+
+                case 5:
+                    System.out.print("Enter first name to search: ");
+                    input.nextLine();
+                    System.out.println(TaskProcessing.searchByFirstName(input.nextLine()));
+
+                    break;
+
+
+                case 6:
+                    keeping_running = false;
+
+
+            }
+        }
+
+    }
+
+    static List<String> inputDetails(Employee e){
+
+        //local temp employee string dat
+
+        List<String > tempEmployee = new ArrayList<>();
+
+        input.nextLine();
+        //if edit is true give them the first name to change else it will give blank output (trrue condition ? ... : false condition) ternary condition
+        System.out.print("ID: " + (edit ? e.getId() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("First Name: " + (edit ? e.getFirstName() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Last Name: " + (edit ? e.getLastName() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("DOB (YYYY/MM/DD): " + (edit ? e.getDob().toString() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Hired Date (YYYY/MM/DD): " + (edit ? e.getHireDate().toString() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Job Role: " + (edit ? e.getJobRole() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        edit = false;
+        return tempEmployee;
+
+    }
+}
+
+//MODELS/Employee Class
+
+package day2.models;
+
+import java.time.LocalDate;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//Employee is a person
+
+public class Employee extends Person {
+
+    private LocalDate hireDate;
+    private String jobRole;
+
+
+//getters and setters
+
+    public LocalDate getHireDate() {return hireDate; }
+
+    public void setHireDate(LocalDate hireDate) { this.hireDate = hireDate; }
+
+    public String getJobRole() {
+        return jobRole;
+    }
+
+    public void setJobRole(String jobRole) {
+        this.jobRole = jobRole;
+    }
+
+    public Employee(int id, String fn, String ln, LocalDate dob, LocalDate hireDate, String jobRole)
+    {
+        //super class should be called in the beginning
+        super(id, fn, ln, dob);
+        this.hireDate = hireDate;
+        this.jobRole = jobRole;
+
+    }
+
+    @Override
+    public String toString() {
+        //toString method returns string in command line output
+        //super class is called to display the person details
+        return "Employee{" + super. toString() +
+                "hireDate=" + hireDate +
+                ", jobRole='" + jobRole + '\'' +
+                '}';
+    }
+}
+
+//MODELS/GeneratedEmployees Class
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class GeneratedEmployees {
+    //List - sequence of objects store with index.
+    public  static List<Employee> employees = new ArrayList<>();
+
+    public static void createEmployees(){
+
+        Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+        Employee louise = new Employee(2, "Louise", "Macdonals", LocalDate.of(1980,4,16),LocalDate.of(2016,12,1),"Trainer");
+
+        employees.add(alex); //adding value in the list..index 0
+        employees.add(louise); //index 1
+       //Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+    }
+}
+
+//MODELS/Person Class
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//abstract means all these data will be used...
+public abstract class Person {
+
+    //members: fields, properties,methods, constructions
+    //fields--data element of the class
+    //private means the data are only available in this class, its been encapsulated
+
+
+    private  int id;
+    private String firstName;
+    private String lastName;
+    private LocalDate dob;
+    private int NOT_BORN = 0;
+
+    //properties (getters and setters)
+    //getId() and setId() method are called to retrieve/request the private id value of the  class.
+
+    public int getId(){return this.id; }
+    public void  setId(int id) {this.id = id;}
+
+    public String getFirstName() { return firstName; }
+
+    public void setFirstName(String firstName) {this.firstName = firstName; }
+
+    public String getLastName() {return lastName; }
+
+    public void setLastName(String lastName) {this.lastName = lastName; }
+
+    public LocalDate getDob() {return dob;}
+
+    public void setDob(LocalDate dob) {this.dob = dob;}
+
+    //Constructors
+    public Person(){}
+
+
+    //overloaded constructor-->that would be used as an object
+
+    public Person(int id, String fn, String ln, LocalDate dob){
+        this.id = id;
+        this.firstName = fn;
+        this.lastName = ln;
+        this.dob = dob;
+    }
+
+    public Person(LocalDate dob){
+        this.dob = dob;
+
+    }
+
+    //methods
+
+    public long getAge(){
+        if(dob == null)
+            return NOT_BORN;
+
+            long years = ChronoUnit.YEARS.between(dob, LocalDate.now());
+            return years;
+
+    }
+
+    @Override //annnotation means this method defined in object class / POLYMORPHISM
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dob=" + dob +
+                ", NOT_BORN=" + NOT_BORN +
+                '}';
+    }
+}
+
+
+
+
+
