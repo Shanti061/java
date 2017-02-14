@@ -1,0 +1,168 @@
+//EMPLOYEE EXAMPLE
+
+
+//Employee Class
+package day2.models;
+
+import java.time.LocalDate;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//Employee is a person
+
+public class Employee extends Person {
+
+    private LocalDate hireDate;
+    private String jobRole;
+
+
+//getters and setters
+
+    public LocalDate getHireDate() {return hireDate; }
+
+    public void setHireDate(LocalDate hireDate) { this.hireDate = hireDate; }
+
+    public String getJobRole() {
+        return jobRole;
+    }
+
+    public void setJobRole(String jobRole) {
+        this.jobRole = jobRole;
+    }
+
+    public Employee(int id, String fn, String ln, LocalDate dob, LocalDate hireDate, String jobRole)
+    {
+        //super class should be called in the beginning
+        super(id, fn, ln, dob);
+        this.hireDate = hireDate;
+        this.jobRole = jobRole;
+
+    }
+
+    @Override
+    public String toString() {
+        //toString method returns string in command line output
+        //super class is called to display the person details
+        return "Employee{" + super. toString() +
+                "hireDate=" + hireDate +
+                ", jobRole='" + jobRole + '\'' +
+                '}';
+    }
+}
+
+
+
+//Person Class
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//abstract means all these data will be used...
+public abstract class Person {
+
+    //members: fields, properties,methods, constructions
+    //fields--data element of the class
+    //private means the data are only available in this class, its been encapsulated
+
+
+    private  int id;
+    private String firstName;
+    private String lastName;
+    private LocalDate dob;
+    private int NOT_BORN = 0;
+
+    //properties (getters and setters)
+    //getId() and setId() method are called to retrieve/request the private id value of the  class.
+
+    public int getId(){return this.id; }
+    public void  setId(int id) {this.id = id;}
+
+    public String getFirstName() { return firstName; }
+
+    public void setFirstName(String firstName) {this.firstName = firstName; }
+
+    public String getLastName() {return lastName; }
+
+    public void setLastName(String lastName) {this.lastName = lastName; }
+
+    public LocalDate getDob() {return dob;}
+
+    public void setDob(LocalDate dob) {this.dob = dob;}
+
+    //Constructors
+    public Person(){}
+
+
+    //overloaded constructor-->that would be used as an object
+
+    public Person(int id, String fn, String ln, LocalDate dob){
+        this.id = id;
+        this.firstName = fn;
+        this.lastName = ln;
+        this.dob = dob;
+    }
+
+    public Person(LocalDate dob){
+        this.dob = dob;
+
+    }
+
+    //methods
+
+    public long getAge(){
+        if(dob == null)
+            return NOT_BORN;
+
+            long years = ChronoUnit.YEARS.between(dob, LocalDate.now());
+            return years;
+
+    }
+
+    @Override //annnotation means this method defined in object class / POLYMORPHISM
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dob=" + dob +
+                ", NOT_BORN=" + NOT_BORN +
+                '}';
+    }
+}
+
+
+//GeneratedEmployees Class
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class GeneratedEmployees {
+    //List - sequence of objects store with index.
+    public  static List<Employee> employees = new ArrayList<>();
+
+    public static void createEmployees(){
+
+        Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+        Employee louise = new Employee(2, "Louise", "Macdonals", LocalDate.of(1980,4,16),LocalDate.of(2016,12,1),"Trainer");
+
+        employees.add(alex); //adding value in the list..index 0
+        employees.add(louise); //index 1
+       //Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+    }
+}

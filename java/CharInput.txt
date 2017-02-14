@@ -1,0 +1,31 @@
+
+//CharInput
+
+package day1;
+
+
+import  java.util.Scanner;
+/**
+ * Created by student on 13-Feb-17.
+ */
+public class CharInput {
+
+    public static void main(String[] args){
+        char a;
+        System.out.println("Enter a character: " );
+        Scanner input = new Scanner(System.in);
+        a = input.next().charAt(0);
+
+        if( Character.isUpperCase(a)){
+
+            System.out.println("Character is in uppercase");
+        }
+        else if( Character.isLowerCase(a)){
+            System.out.println("Character is in lowercase");
+        }
+        else{
+
+            System.out.println("its a number");
+        }
+    }
+}

@@ -1,0 +1,198 @@
+//CONTACT DETAILS IN YOUR PHONE
+
+
+//AddressBook Class
+
+public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    //making a constructor
+    public AddressBook(String fn, String ln){
+
+        this.firstName = fn;
+        this.lastName = ln;
+
+
+    }
+
+    //converting to string
+    @Override
+    public String toString() {
+        return "AddressBook{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
+}
+------------
+
+
+Address Class
+
+
+package addressBookProgram;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class Address {
+    public int houseNum;
+    public String streetName;
+    public String city;
+    public String country;
+
+    public int getHouseNum() {
+        return houseNum;
+    }
+
+    public void setHouseNum(int houseNum) {
+        this.houseNum = houseNum;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public  Address(int houseNum, String streetName, String city, String country){
+
+        this.houseNum = houseNum;
+        this.streetName = streetName;
+        this.city =city;
+        this.country = country;
+
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "houseNum=" + houseNum +
+                ", streetName='" + streetName + '\'' +
+                ", city='" + city + '\'' +
+                ", country='" + country + '\'' +
+                '}';
+    }
+}
+
+----------------------------------------------------
+//ContactDetails Class
+
+package addressBookProgram;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class ContactDetails {
+    private String emailId;
+    //private int dob;
+
+    private AddressBook person;
+    private Address address;
+
+    public String getEmailId() {
+        return emailId;
+    }
+
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
+
+    //public int getDob() {
+       // return dob;
+    //}
+
+    //public void setDob(int dob) {
+       // this.dob = dob;
+   // }
+
+//address and addressbook class are added to contactdetails class as fields
+    public ContactDetails( AddressBook person,Address address, String emailId ) {
+
+        this.person =person;
+        this.address = address;
+        this.emailId = emailId;
+        //this.dob = dob;
+    }
+
+    @Override
+    public String toString() {
+        return "ContactDetails{" +
+                "emailId='" + emailId + '\'' +
+                ", person=" + person +
+                ", address=" + address +
+                '}';
+    }
+}
+------------------------------------------
+//AddContact Class
+
+package addressBookProgram;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class AddContact {
+
+    public static List<ContactDetails> Contact = new ArrayList<>();
+
+    public static void AddNewContact(){
+
+        ContactDetails leena = new ContactDetails(new AddressBook("Leena", "Gurung"), new Address(7, "Kelvin Street", "London","UK"),"leenagrg@hotmail.com");
+        Contact.add(leena);
+    }
+}
+
+---------------------------
+
+//Main Program
+
+package addressBookProgram;
+
+import static addressBookProgram.AddContact.Contact;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class MainProgram {
+
+
+    public static void main(String[] args){
+
+       AddContact.AddNewContact();
+
+
+        //loop to display the values from the generatedemployees class
+        for(ContactDetails a : Contact){
+            System.out.println(a);
+        }
+    }
+}
+

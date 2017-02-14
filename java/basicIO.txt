@@ -1,0 +1,37 @@
+//BasicInputOutput
+
+package day1;
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import  java.util.Scanner;
+/**
+ * Created by student on 13-Feb-17.
+ */
+public class BasicInputOutput {
+
+    //main method
+    public static void main(String[] args){
+    //getting user input/read string
+        Scanner input = new Scanner(System.in);
+
+        //read a line and return the value to result String object
+        System.out.println("Using Scanner: " +  input.nextLine());
+
+        //BufferReader
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String result2 = "";
+
+        try {
+             result2 = br.readLine();
+        } catch(IOException e){
+            //error msg
+            e.printStackTrace();
+        }
+
+        System.out.println("Using BufferReader: " + result2);
+    }
+
+}
