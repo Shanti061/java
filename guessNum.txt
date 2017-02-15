@@ -1,0 +1,137 @@
+//GUESS THE NUMBER GUI
+
+package guessGame;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+/**
+ * Created by student on 15-Feb-17.
+ */
+public class GuessGame {
+
+    //random number object generator
+    private Random random = new Random();
+    int generatedNumber, userInput;
+
+    private JTextField guessInput;
+    private JLabel  resultlbl , lbl1,lbl2;
+
+    JFrame mainFrame;
+    private JButton newGameButton;
+
+
+    //constructor
+    public GuessGame(){
+        //set the GUI: JFrame, JLabel, JTextField, JButton
+
+        mainFrame = new JFrame("Guessing Game ");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //closes the window box when the close button is clicked
+        mainFrame.setSize(500, 250); //size - width,height
+        mainFrame.setLayout(new FlowLayout(1,5,5)); //sets the button next to other button...1,1,1 is the space between them
+
+        Dimension dimension = mainFrame.getToolkit().getScreenSize();
+        mainFrame.setLocation(  dimension.width/2 - mainFrame.getWidth()/2, dimension.height/2 -mainFrame.getHeight()/2);
+
+        //LABELS ON THE MAINFRAME
+        lbl1 = new JLabel("I have a number between 1 to 100 \n ");
+        System.out.println();
+
+
+
+        lbl2 = new JLabel(" Can you guess my number? Enter your Guess: \n ");
+
+
+
+        resultlbl = new JLabel("Your result appears here...");
+        guessInput = new JTextField(10);
+        guessInput.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                userInput = Integer.parseInt(guessInput.getText());
+                match();
+                guessInput.selectAll();
+            }
+        });
+
+
+
+        //resultlbl = new JLabel("Guess Result ");
+
+
+        //Button part
+        newGameButton = new JButton("New Game");
+        newGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resultlbl.setText("Guess Result");
+                guessInput.setText("");
+                guessInput.setEditable(true);
+                generate();
+                mainFrame.repaint();
+
+            }
+        });
+
+        mainFrame.getContentPane().add(lbl1);
+        mainFrame.getContentPane().add(lbl2);
+        mainFrame.getContentPane().add(resultlbl);
+        mainFrame.getContentPane().add(guessInput);
+        mainFrame.getContentPane().add(newGameButton);
+
+
+        mainFrame.setVisible(true);
+    }
+
+    //method to generate number
+
+    private void generate(){
+        generatedNumber = random.nextInt(100) + 1; //the starting value of random() is 0 so +1 is done to make the starting value from 1
+
+    }
+
+    private void match(){
+
+      //match the generated number with user input
+    //set label to produce result
+    //JFrame method called repaint();
+
+
+        if(userInput > 100 || userInput < 1){
+            resultlbl.setText("Your number is out of scope.");
+            guessInput.setEditable(false);
+
+        } else{
+
+            if(userInput > generatedNumber)
+                resultlbl.setText("You guessed a bigger number");
+
+            else if(userInput < generatedNumber)
+                resultlbl.setText("Your guess is low");
+            else{
+                resultlbl.setText("");
+                guessInput.setEditable(false);
+                JOptionPane.showMessageDialog(null, "MATCH");
+            }
+
+        }
+
+        mainFrame.repaint();
+
+
+
+
+    }
+
+
+    public static void main(String[] args){
+
+        new GuessGame();
+    }
+}
+
+
+
