@@ -1,0 +1,644 @@
+DATABASE CONNECTION TO JAVA
+//DATABASE PACKAGE
+//ConnectDb Class
+
+package day2.database;
+
+import  java.sql.Connection;
+import java.sql.DriverManager;
+/**
+ * Created by student on 16-Feb-17.
+ */
+public class ConnectDb {
+
+    private Connection con;
+
+    //connection strings variables
+    private String userName = "awesome";
+    private String password = "Password100";
+    private String url = "jdbc:mysql://localhost:3306/boom?UseSSL=false"; //using the jdbc library for the database connection: 3306 is a default network door
+    //UseSSL false means it doesn't need encryption. UseSSL should be true while making a website.
+
+    public ConnectDb() throws Exception{
+        //load the driver
+        Class.forName("com.mysql.jdbc.Driver");
+        //connect to database
+        con = DriverManager.getConnection(url,userName,password); //
+
+    }
+
+    //Alt+ins getter
+    public Connection getCon() {
+        return con;
+    }
+}
+
+
+//DATABASE PACKAGE
+
+//OperateDb Class
+
+package day2.database;
+
+import day2.models.Employee;
+
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
+
+/**
+ * Created by student on 16-Feb-17.
+ */
+public class OperateDb {
+
+    private Connection con;
+
+    //
+    public OperateDb(Connection con){
+
+        this.con= con;
+    }
+
+    //method
+    public void createEmployeeTable() throws SQLException{
+
+        Statement statement = con.createStatement();
+
+        //create table
+        //  ALL THE UPPERCASE WORDS ARE SQL QUERY
+        statement.executeUpdate(
+
+                "CREATE TABLE employee (" + "id INTEGER NOT NULL AUTO_INCREMENT KEY," +
+                        "first_name VARCHAR(50) NOT NULL," +
+                        "last_name VARCHAR(100) NOT NULL," +
+                        "dob DATE NOT NULL," +
+                        "hire_date DATE NOT NULL," +
+                        "job_role VARCHAR(50) NOT NULL)"
+        );
+
+
+    }
+
+    //
+    public List<Employee> queryAll() throws SQLException{
+        return query("SELECT * FROM employee ");
+    }
+
+    public List<Employee> queryByFirstName(String fn) throws SQLException{
+        return query("SELECT * FROM employee WHERE first_name = '" + fn + "'");
+    }
+
+    public List<Employee> query(String query) throws SQLException{
+
+    Statement statement = con.createStatement();
+    //Reference to the result object from queries
+        ResultSet rs;
+
+        Employee temp; //represent each row retrieve from result
+
+        //our local temporary list of employees retrieved
+        List<Employee> tempEmployees = new ArrayList<>();
+
+        //**** get the result from DB as rs object
+        rs = statement.executeQuery(query);
+
+        //retrieve...from ResultSet Object
+        //while the next line existed
+        while(rs.next()){
+
+            //getting the value from the table using index and adds to the list
+            temp = new Employee(
+                rs.getInt(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getDate(4).toLocalDate(),
+                    rs.getDate(5).toLocalDate(),
+                    rs.getString(6));
+
+            //add to our temp collection
+            tempEmployees.add(temp);
+            }
+
+
+        return tempEmployees;
+    }
+
+    public void addEmployee(Employee temp) throws SQLException{
+
+        PreparedStatement statement = con.prepareStatement(
+                "INSERT INTO employee" + "(first_name, last_name,dob,hire_date,job_role)" +
+                        "VALUES (?,?,?,?,?)");
+
+        statement.setString(1, temp.getFirstName());
+        statement.setString(2, temp.getLastName());
+        statement.setDate(3, Date.valueOf(temp.getDob()));
+        statement.setDate(4, Date.valueOf(temp.getHireDate()));
+        statement.setString(5, temp.getJobRole());
+
+
+        //send to the DB to create new record!
+
+        statement.executeUpdate();
+        statement.close();
+    }
+}
+
+
+
+//GUI PACKAGE
+---------------CommandInterface Class------------
+
+
+package day2.gui;
+
+import day2.models.Employee;
+import day2.processor.TaskProcessing;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import static day2.models.GeneratedEmployees.employees;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class CommandInterface {
+
+    static Scanner input = new Scanner(System.in);
+    static boolean edit = false; //user wants to create new record
+
+
+    public static  void display(){
+        //temp int data to store user's choice
+        int choice;
+        boolean keeping_running = true; //
+
+        //give 6 options
+
+        //infinite loop until keep_running is false.
+        while(keeping_running){
+
+            do{
+                //choices
+                System.out.println("Welcome to Employee Awesome Program");
+                System.out.println("1. List all Employees");
+                System.out.println("2. Add new Employee");
+                System.out.println("3. Edit an Employee");
+                System.out.println("4. Remove an Employee");
+                System.out.println("5. Search");
+                System.out.println("6. Terminate");
+                System.out.print("Please input option between 1 -6 : ");
+
+                choice = input.nextInt();
+            }while(choice < 1 || choice > 6); //if the choice is less than 1 or greater than 6 the loop will continue looping
+
+            //after the user chooses an option it will enter the switch case
+            switch(choice){
+
+                //listAllEmployees method is inside taskprocessing class
+                case 1:
+                    try {
+                        TaskProcessing.listAllEmployees();
+                    }catch (SQLException ex1){
+                        System.out.println("cannot query any records: " + ex1);
+                    }
+                break;
+
+               case 2:
+                   //creating new employee, adding details, taskprocessing will display
+                   //in cmd interface inputDetails method retreives data from user using List.
+                   //
+                    System.out.println(TaskProcessing.createNew(inputDetails(null)));
+                   break;
+
+                case 3:
+                    //user wants to edit data
+                    edit = true;
+                    System.out.println("Enter search by first name: ");
+                    input.nextLine();
+                    try {
+                        System.out.println(TaskProcessing.searchByFirstName(input.nextLine()));
+                    }catch(SQLException ex2) {
+                        System.out.println("Error search : " + ex2);
+                    }
+                    int index = input.nextInt();
+                    System.out.println(TaskProcessing.editEmployee(index, inputDetails( employees.get(index))));
+                    break;
+
+                case 4:
+                    System.out.print("Enter first name of the employee to be removed: ");
+                    input.nextLine();
+                    try {
+                        System.out.println(TaskProcessing.searchByFirstName(input.nextLine()));
+                    }catch(SQLException ex3){
+                        System.out.println("error search: " + ex3);
+                    }
+                    System.out.println("Enter index to remove: ");
+                    System.out.println(TaskProcessing.removeEmployee(input.nextInt()));
+                    break;
+
+                case 5:
+                    System.out.print("Enter first name to search: ");
+                    input.nextLine();
+                    //calling searchbyfirstname method from taskprocessing class and passing the user input to check.
+                    try {
+                        System.out.println(TaskProcessing.searchByFirstName(input.nextLine()));
+                    }catch (SQLException ex4){
+                        System.out.println("error search: " + ex4);
+                    }
+                    break;
+
+
+                case 6:
+                    keeping_running = false; //while loop terminates
+
+
+            }
+        }
+
+    }
+
+    static List<String> inputDetails(Employee e){
+
+        //local temp employee string data
+
+        List<String > tempEmployee = new ArrayList<>();
+
+        input.nextLine();
+        //if edit is true give them the first name to change else it will give blank output (trrue condition ? ... : false condition) ternary condition
+        /*
+
+        System.out.print("ID: " + (edit ? e.getId() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+        */
+        tempEmployee.add(" ");
+
+        System.out.print("First Name: " + (edit ? e.getFirstName() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Last Name: " + (edit ? e.getLastName() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("DOB (YYYY/MM/DD): " + (edit ? e.getDob().toString() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Hired Date (YYYY/MM/DD): " + (edit ? e.getHireDate().toString() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        System.out.print("Job Role: " + (edit ? e.getJobRole() + "\n Change:" : ""));
+        tempEmployee.add(input.nextLine());
+
+        edit = false;
+        return tempEmployee;
+
+    }
+}
+
+
+MODELS PACKAGE
+
+-----------Employee Class
+
+package day2.models;
+
+import java.time.LocalDate;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//Employee is a person
+
+public class Employee extends Person {
+
+    private LocalDate hireDate;
+    private String jobRole;
+
+
+//getters and setters to retrieve the private variable data.
+
+    public LocalDate getHireDate() {return hireDate; }
+
+    public void setHireDate(LocalDate hireDate) { this.hireDate = hireDate; }
+
+    public String getJobRole() {
+        return jobRole;
+    }
+
+    public void setJobRole(String jobRole) {
+        this.jobRole = jobRole;
+    }
+
+
+    //constructor
+    public Employee(int id, String fn, String ln, LocalDate dob, LocalDate hireDate, String jobRole)
+    {
+        //super class should be called in the beginning..
+        super(id, fn, ln, dob);
+        this.hireDate = hireDate;
+        this.jobRole = jobRole;
+
+    }
+
+    @Override
+    public String toString() {
+        //toString method returns string in command line output
+        //super class calls the Person call to display the person details
+        return "Employee{" + super. toString() +
+                "hireDate=" + hireDate +
+                ", jobRole='" + jobRole + '\'' +
+                '}';
+    }
+}
+
+models package
+------------------GeneratedEmployees Class
+
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class GeneratedEmployees {
+    //List - sequence of objects store with index.
+    public  static List<Employee> employees = new ArrayList<>();
+
+
+    public static void createEmployees(){
+
+        Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+        Employee louise = new Employee(2, "Louise", "Macdonals", LocalDate.of(1980,4,16),LocalDate.of(2016,12,1),"Trainer");
+
+        employees.add(alex); //adding value in the list..index 0
+        employees.add(louise); //index 1
+       //Employee alex = new Employee(1, "Alex", "Kennedy", LocalDate.of(1983,4,16),LocalDate.of(2017,1,1),"Trainer");
+
+    }
+}
+
+MODELS PACKAGE
+
+package day2.models;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+
+//abstract means all these data will be used...
+public abstract class Person {
+
+    //members: fields, properties,methods, constructions
+    //fields--data element of the class
+    //private means the data are only available in this class, its been encapsulated
+
+
+    private  int id;
+    private String firstName;
+    private String lastName;
+    private LocalDate dob;
+    private int NOT_BORN = 0;
+
+    //properties (getters and setters)
+    //getId() and setId() method are called to retrieve/request the private id value of the  class.
+
+    public int getId(){return this.id; }
+    public void  setId(int id) {this.id = id;}
+
+    public String getFirstName() { return firstName; }
+
+    public void setFirstName(String firstName) {this.firstName = firstName; }
+
+    public String getLastName() {return lastName; }
+
+    public void setLastName(String lastName) {this.lastName = lastName; }
+
+    public LocalDate getDob() {return dob;}
+
+    public void setDob(LocalDate dob) {this.dob = dob;}
+
+    //Constructors
+    public Person(){}
+
+
+    //overloaded constructor-->that would be used as an object
+
+    public Person(int id, String fn, String ln, LocalDate dob){
+        this.id = id;
+        this.firstName = fn;
+        this.lastName = ln;
+        this.dob = dob;
+    }
+
+    public Person(LocalDate dob){
+        this.dob = dob;
+
+    }
+
+    //methods
+
+    public long getAge(){
+        if(dob == null)
+            return NOT_BORN;
+
+            long years = ChronoUnit.YEARS.between(dob, LocalDate.now());
+            return years;
+
+    }
+
+    @Override //annnotation means this method defined in object class / POLYMORPHISM
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dob=" + dob +
+                ", NOT_BORN=" + NOT_BORN +
+                '}';
+    }
+}
+
+
+---PROGRAMMAIN CLASS
+
+package day2.processor;
+
+import day2.gui.CommandInterface;
+import day2.models.Employee;
+import day2.models.GeneratedEmployees;
+
+import static day2.models.GeneratedEmployees.employees;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class ProgramMain {
+
+    public static void main(String[] args)
+    {
+        //create temp employees collection
+        //
+        //GeneratedEmployees.createEmployees();
+
+        TaskProcessing.setUpDb(); //database connection
+        CommandInterface.display();
+
+        //loop to display the values from the generatedemployees class
+
+    }
+
+}
+
+---------TASKPROCESSING CLASS
+
+package day2.processor;
+
+import day2.database.ConnectDb;
+import day2.database.OperateDb;
+import day2.models.Employee;
+
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.List;
+
+import static day2.models.GeneratedEmployees.employees;
+
+/**
+ * Created by student on 14-Feb-17.
+ */
+public class TaskProcessing {
+    private static OperateDb db;
+
+    //method that creats a connectionn
+    public static void setUpDb(){
+        try {
+            ConnectDb connectDb = new ConnectDb(); //connection object
+            //object to manipulate database based on the connection
+            db = new OperateDb(connectDb.getCon()); //used to manipulate data
+            //db.createEmployeeTable();
+        }catch (Exception e){
+            System.out.println("Error connecting to database.");
+        }
+    }
+
+    public static void listAllEmployees() throws SQLException{
+        //
+        employees.clear();
+        employees = db.queryAll();
+        for(Employee e : employees){
+            System.out.println(e);
+        }
+    }
+
+    public static String createNew(List<String> data) {
+        try {
+            String[] dob = data.get(3).split("/"); //splitting the dob value to string and assigning to an array.
+            String[] hd = data.get(4).split("/");
+            //first value of the list/ID
+            Employee temp = new Employee(0, data.get(1), data.get(2),
+                    LocalDate.of(Integer.parseInt(dob[0]), Integer.parseInt(dob[1]), Integer.parseInt(dob[2])),
+                    LocalDate.of(Integer.parseInt(hd[0]), Integer.parseInt(hd[1]), Integer.parseInt(hd[2])), data.get(5));
+
+            db.addEmployee(temp); //adding to database
+            return "Successfully created: " + temp.getFirstName();
+        } catch (Exception e){
+            return "Failure caused by: " + e ;
+        }
+    }
+
+
+    public static String searchByFirstName(String fn) throws SQLException{
+        employees.clear();
+        employees = db.queryByFirstName(fn);
+        String result = "";
+
+        /*
+        for(int i = 0; i < employees.size(); i++){
+            //comparing the name with every employee name for search
+            if(employees.get(i).getFirstName().equalsIgnoreCase(fn))  //get the record's firstname check with the user input..equalsIgnoreCase() ignores the typed string case.
+            result += String.format("[%s] %s", i, employees.get(i).toString()) + "\n";
+
+
+        }
+        if(result != "")
+            return result;
+    */
+        for(int i = 0; i < employees.size(); i++)
+            result += String.format("[%s] %s", i, employees.get(i).toString()) + "\n";
+
+        if(result != "")
+            return result;
+        return "NOT FOUND!!";
+
+
+    }
+
+
+    public static String removeEmployee(int index){
+        try{
+            employees.remove(index);
+            return "REMOVED SUCCESSFULLY";
+
+        } catch(Exception e){
+            return "FAILED to remove caused by: " + e;
+
+        }
+
+    }
+
+    public static String editEmployee(int index, List<String > data){
+        try{
+
+            String[] dob = data.get(3).split("/"); //splitting the dob value to string and assigning to an array.
+            String[] hd = data.get(4).split("/");
+
+
+
+            //check data to map whether to change or not
+            if(!("" .equals(data.get(0)))) // if its not empty we change the value
+            employees.get(index).setId(Integer.parseInt(data.get(0)));
+
+            if(!("" .equals(data.get(1))))
+                employees.get(index).setFirstName(data.get(1));
+
+
+            if(!("" .equals(data.get(2))))
+                employees.get(index).setLastName(data.get(2));
+
+
+            if(!("" .equals(data.get(3))))
+                employees.get(index).setDob(LocalDate.of(Integer.parseInt(dob[0]), Integer.parseInt(dob[1]), Integer.parseInt(dob[2])));
+
+
+            if(!("" .equals(data.get(4))))
+                employees.get(index).setHireDate(LocalDate.of(Integer.parseInt(hd[0]), Integer.parseInt(hd[1]), Integer.parseInt(hd[2])));
+
+
+            if(!("" .equals(data.get(5))))
+                employees.get(index).setJobRole(data.get(5));
+
+            return "SUCCESS";
+
+        }catch (Exception e){
+
+            return "Fail caused by: " + e;
+        }
+
+    }
+
+}
+
+
+
+
+
