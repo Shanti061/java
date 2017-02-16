@@ -1,0 +1,97 @@
+
+insert into admin
+(first_name,last_name,username,password)
+values
+('Shanti','Pun','shantip','Password123');
+
+create table customer(
+id int not null auto_increment key,
+first_name varchar(50) not null,
+last_name varchar(80) not null,
+address varchar(100) ,
+contact varchar );
+
+insert into customer
+(first_name,last_name,address,contact)
+values
+('Shanti','Pun','CR0 4UU',1234567);
+
+alter table customer 
+add column
+cus_img LONGBLOB
+after contact;
+
+
+create table ticket(
+id int not null auto_increment,
+admin_id int not null,
+customer_id int not null,
+time_open datetime not null,
+time_update datetime,
+subject varchar(50) not null,
+message text(65535),
+status tinyint not null,    for tinyint 1 is true and 0 is false
+time_close datetime,
+primary key (id),
+foreign key (admin_id) references admin(id),
+foreign key (customer_id) references customer(id)
+);
+
+
+show columns from ticket; //to view the columns of ticket table
+
+insert into ticket
+(admin_id,customer_id,time_open,subject,status)
+values
+(1,2,'2017-02-16 12:04:00','Need a mew football',1);
+
+
+
+select
+a.subject, //getting subject and time from table a
+a.time_open,
+a.status,
+b.id,  //getting id and first name from table b
+b.first_name,
+c.id,
+c.first_name
+from ticket a
+join admin b on a.admin_id=b.id 
+join customer c on a.customer_id =c.id 
+where b.id = 1;
+
+---------->quering from 3 tables/relational database
+
+
+grant all privileges on boom.* to 'awesome'@'localhost'
+identified by 'Password100';
+
+insert into employee
+(first_name,last_name,dob,hire_date,job_role)
+values
+('Shanti','Pun','1999-01-01','2017-01-01','teacher');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

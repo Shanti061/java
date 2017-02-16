@@ -1,0 +1,83 @@
+//EXCEPTION EXAMPLE
+
+package day4;
+
+/**
+ * Created by student on 16-Feb-17.
+ */
+public class ExceptionClass {
+
+    public static void main(String[] args){
+        try{
+            compute(1); //not thrown
+            compute(15); //thrown MyException
+        }catch (MyException e){
+            System.out.println("We caught: " + e);
+        }
+
+    }
+
+    static void compute(int a) throws MyException { //computing the value user puts in/input value... throws in a method should have a catch
+        System.out.println("Compute(" + a + ") ");
+        if(a > 10)
+            throw new MyException(a);
+    }
+}
+
+//should be outside of the main class/program
+class MyException extends Exception{
+
+    private int detail;
+    MyException(int a){
+        detail = a;
+
+    }
+
+    public String toString(){
+
+        return "MyException: " + detail;
+    }
+}
+
+
+------------------
+//MyException Class
+
+package day4;
+
+/**
+ * Created by student on 16-Feb-17.
+ */
+public class ExceptionClass {
+
+    public static void main(String[] args){
+        try{
+            compute(1); //not thrown
+            compute(15); //thrown MyException
+        }catch (MyException e){
+            System.out.println("We caught: " + e);
+        }
+
+    }
+
+    static void compute(int a) throws MyException { //computing the value user puts in/input value... throws in a method should have a catch
+        System.out.println("Compute(" + a + ") ");
+        if(a > 10)
+            throw new MyException(a);
+    }
+}
+
+//should be outside of the main class/program
+class MyException extends Exception{
+
+    private int detail;
+    MyException(int a){
+        detail = a;
+
+    }
+
+    public String toString(){
+
+        return "MyException: " + detail;
+    }
+}

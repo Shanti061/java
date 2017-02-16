@@ -1,0 +1,45 @@
+//HANDLING INTEGER-EXCEPTION
+
+package day4;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+
+/**
+ * Created by student on 16-Feb-17.
+ */
+public class HandlingInteger {
+
+    public static void main(String[] args){
+
+        System.out.println("Enter a number between 1 and 10: ");
+
+        //infinite loop
+        while(true){
+            try{
+
+                Scanner input = new Scanner(System.in);
+
+                int yourNum = input.nextInt();
+                if(yourNum < 1 || yourNum > 10)
+                    throw new Exception("Number must be between 1 and 10 ");
+                System.out.println("Your number is valid:" + yourNum);
+
+                break;
+
+            } catch (InputMismatchException inputMis){
+
+                System.out.println("Please put in a number");
+            }
+
+            catch (Exception e){
+                e.printStackTrace(); //prints out the value in the throw Exception
+            } finally { //similar to default in switch...it will execute  if there is any error or not
+                System.out.println("Thank you for playing. ");
+            }
+
+        }
+
+    }
+}
